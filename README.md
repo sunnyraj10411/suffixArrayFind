@@ -1,0 +1,2 @@
+# suffixArrayMUMmer
+Code for project
