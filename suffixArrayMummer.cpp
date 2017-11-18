@@ -6,6 +6,7 @@
 #include<cstdlib>
 #include<cmath>
 #include<algorithm>
+#include<cstdio>
 
 
 using namespace std; 
@@ -78,9 +79,16 @@ int FindPattern::printBucket(vector<Bucket> &vBucket)
 
 int FindPattern::printSA(vector<int> sa)
 {
+	cout<<"txt"<<txt<<endl;
 	for(int i = 0 ; i < sa.size(); i++)
 	{
-		cout<<txt[sa[i]]<<" "<<sa[i]<<endl;
+		//printf("%s ",txt.c_str()[sa[i]]);
+		cout<<i<<" "<<txt[sa[i]]<<" "<<sa[i]<<" ";
+		for( int j = sa[i]; j < txt.size(); j++)
+		{
+		//	cout<<txt[j];
+		}
+		cout<<endl;
 	}
 	return 1; 
 }
@@ -168,9 +176,24 @@ vector<int> FindPattern::findRecurse(int start, int end, int l, int r,int index,
 	if( l == r)
 	{
 		int m = getCompLcp(SA[mid],pat,l);
-			
-		cout<<" sa[mid] "<<mid<<" l "<<l<<" m "<<m<<" vs "<<pat[l+m] <<" vs "<<txt[SA[mid] + l] <<endl;
-		//exit(1);
+
+		cout<<start<<" sa[mid] "<<mid<<" "<<end<<" l "<<l<<" m "<<m<<" vs "<<pat[l+m] <<" vs "<<txt[SA[mid] + l] <<endl;
+
+		if( l+m == pat.size() )
+		{
+			cout<<"Doing both "<<start<<" "<<mid<<" "<<end<<endl;
+			//do both size
+			vector<int> res1 = findRecurse(start,mid,l,l+m,2*index+1,pat);
+			vector<int> res2 = findRecurse(mid,end,l+m,r,2*index+2, pat);
+
+			cout<<" Res: "<<res1[0]<<" "<<res1[1]<<" "<<res2[0]<<" "<<res2[1]<<endl;
+
+			vector<int> result;
+			result.push_back(res1[0]);	
+			result.push_back(res2[1]);
+			return result;	
+
+		}
 
 		if( pat[l+m] > txt[SA[mid]+l+m])
 		{
@@ -195,21 +218,26 @@ vector<int> FindPattern::findRecurse(int start, int end, int l, int r,int index,
 		}
 		else
 		{
-			cout<<" l > r mid"<<endl;
-			if( l == pat.size())
-			{
-				//search bottom
-
-				recResult = findRecurse(mid,end,l+m,r,2*index+2, pat); 
-
-				vector<int> result;
-				result.push_back(start);
-				result.push_back(recResult[1]);
-				return result;
-			}
-
 			//equal we have to do a lexicographic comparison
 			int m = getCompLcp(SA[mid],pat,l);
+			cout<<"Doing  "<<start<<" "<<mid<<" "<<end<<" "<<l+m<<" "<<pat.size()<<endl;
+	
+			if( l+m == pat.size() )
+			{
+				cout<<"Doing both "<<start<<" "<<mid<<" "<<end<<endl;
+				//do both size
+				vector<int> res1 = findRecurse(start,mid,l,l+m,2*index+1,pat);
+				vector<int> res2 = findRecurse(mid,end,l+m,r,2*index+2, pat);
+			
+				cout<<" Res: "<<res1[0]<<" "<<res1[1]<<" "<<res2[0]<<" "<<res2[1]<<endl;
+
+				vector<int> result;
+				result.push_back(res1[0]);	
+				result.push_back(res2[1]);
+				return result;	
+
+			}
+
 			if( pat[l+m] > txt[SA[mid]+l+m])
 			{
 				return findRecurse(mid,end,l+m,r,2*index+2, pat);
@@ -235,21 +263,30 @@ vector<int> FindPattern::findRecurse(int start, int end, int l, int r,int index,
 		}
 		else
 		{
-			cout<<" In equal"<<endl;
-			if( r == pat.size())
-			{
-				//search top 
-			        recResult = findRecurse(start,mid,l,r+m,2*index+1,pat);	
-				vector<int> result;
-				result.push_back(recResult[0]);
-				result.push_back(end);
-				return result;
-			}
-
 			//equal we have to do a lexicographic comparison
 			int m = getCompLcp(SA[mid],pat,r);
+			cout<<"Doing  "<<start<<" "<<mid<<" "<<end<<" "<<r+m<<" "<<pat.size()<<" b"<<endl;
+
+			if( r+m == pat.size() )
+			{
+				cout<<"Doing both "<<start<<" "<<mid<<" "<<end<<endl;
+				//do both size
+				vector<int> res1 = findRecurse(start,mid,l,r+m,2*index+1,pat);
+				vector<int> res2 = findRecurse(mid,end,r+m,r,2*index+2, pat);
+				
+				cout<<" Res: "<<res1[0]<<" "<<res1[1]<<" "<<res2[0]<<" "<<res2[1]<<endl;
+
+				vector<int> result;
+				result.push_back(res1[0]);	
+				result.push_back(res2[1]);	
+				return result;	
+
+			}
+
+
+
 			cout<<" m "<<m<<endl;
-			if( pat[l+m] > txt[SA[mid]+l+m])
+			if( pat[r+m] > txt[SA[mid]+r+m])
 			{
 				return findRecurse(mid,end,r+m,r,2*index+2, pat);
 			}
@@ -427,9 +464,9 @@ int FindPattern::breakBucket(vector<Bucket> &vBucket,vector<int> &bucketIndex,co
 int FindPattern::createSA()
 {
 	//txt = "aabaaabbaacda$";
-	txt = "MISSISSIPPI$";
+	//txt = "MISSISSIPPI$";
 	//txt = "TTAATTTTAGAAATACAGGTTTCTAAAACGCTTTTATGCGGCTCGCCCTCATAGCCAAAACTCGCATGCA$";
-	//txt = a+"$";
+	txt = a+"$";
 
 	vector<Bucket> vBucket;
 	vector<int> bucketIndex(txt.length(),0);
@@ -584,11 +621,18 @@ int FindPattern::printLcpBinaryTree()
 int FindPattern::createSaAndLcp()
 {
 	//create suffix array	
+	//vector<BinaryNode> binTreeTemp(10,{0,0,0});
+	
 	createSA();
+
+	int size  = (log2(txt.size())+1)*txt.size();
+	cout<<"Size "<<size<<" txt.size "<<txt.size()<<endl;
+	vector<BinaryNode> binTreeTemp(size,{0,0,0});
+
 	createRFromSA();
 	createLcpFromSA();
-	cout<<"Log "<<log2(txt.size())<<endl;
-	vector<BinaryNode> binTreeTemp((log2(txt.size())+1)*txt.size(),{0,0,0});
+	cout<<"Log "<<log2(txt.size())<<" size "<<(log2(txt.size())+1)*txt.size()<<endl;
+	//vector<BinaryNode> binTreeTemp((log2(txt.size())+1)*txt.size(),{0,0,0});
 	lcpBinaryTree = binTreeTemp;
 	createLcpBinaryTree(0,SA.size()-1,0);
 	//printLcpBinaryTree();
