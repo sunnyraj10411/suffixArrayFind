@@ -56,6 +56,7 @@ class FindPattern{
 	int getCompLcp(int start,string pat,int idx); 
 	int createLcpBinaryTree(int start, int end, int index);
 	int printLcpBinaryTree();
+	int findTreeSize(int len);
 	vector<int> findRecurse(int start, int end, int l, int r,int index, string pat);	
 
 	public:
@@ -66,6 +67,18 @@ class FindPattern{
 };
 
 
+int FindPattern::findTreeSize(int len)
+{
+	int pow = 2;
+	for(int i = 1 ; i < 100 ; i++)
+	{
+		if( len < pow)
+		{
+			return 2*pow;
+		}
+		pow = pow*2;
+	}
+}
 
 int FindPattern::printBucket(vector<Bucket> &vBucket)
 {
@@ -79,7 +92,6 @@ int FindPattern::printBucket(vector<Bucket> &vBucket)
 
 int FindPattern::printSA(vector<int> sa)
 {
-	cout<<"txt"<<txt<<endl;
 	for(int i = 0 ; i < sa.size(); i++)
 	{
 		//printf("%s ",txt.c_str()[sa[i]]);
@@ -194,7 +206,6 @@ vector<int> FindPattern::findRecurse(int start, int end, int l, int r,int index,
 			return result;	
 
 		}
-
 		if( pat[l+m] > txt[SA[mid]+l+m])
 		{
 			return findRecurse(mid,end,l+m,r,2*index+2, pat);
@@ -316,12 +327,17 @@ int FindPattern::find(string pat)
 	int l = getCompLcp(SA[start],pat,0);
         int r = getCompLcp(SA[end],pat,0);
 
-	cout<<"R "<<r<<" l "<<l<<endl;
+	//cout<<"R "<<r<<" l "<<l<<endl;
         
 	vector<int> result = findRecurse(start, end, l, r, 0, pat);	
 
 	cout<<" result "<<result[0]<<" to "<<result[1]<<endl;
-	cout<<" result "<<SA[result[0]]<<" to "<<SA[result[1]]<<endl;
+
+	cout<<"Pattern found at the following places: "<<endl;
+	for(int i = result[0] ; i <= result[1] ; i++)
+	{
+		cout<<SA[i]<<endl;
+	}
 	
 }
 
@@ -621,18 +637,14 @@ int FindPattern::printLcpBinaryTree()
 int FindPattern::createSaAndLcp()
 {
 	//create suffix array	
-	//vector<BinaryNode> binTreeTemp(10,{0,0,0});
-	
 	createSA();
 
-	int size  = (log2(txt.size())+1)*txt.size();
+	int size = findTreeSize(txt.size());
 	cout<<"Size "<<size<<" txt.size "<<txt.size()<<endl;
 	vector<BinaryNode> binTreeTemp(size,{0,0,0});
 
 	createRFromSA();
 	createLcpFromSA();
-	cout<<"Log "<<log2(txt.size())<<" size "<<(log2(txt.size())+1)*txt.size()<<endl;
-	//vector<BinaryNode> binTreeTemp((log2(txt.size())+1)*txt.size(),{0,0,0});
 	lcpBinaryTree = binTreeTemp;
 	createLcpBinaryTree(0,SA.size()-1,0);
 	//printLcpBinaryTree();
@@ -653,6 +665,8 @@ int FindPattern::read()
 			//cout<<line<<endl;
 			if(count != 0)
 				a += line;
+			else
+				a = line;
 			count++;
 		}
 		file1D.close();
@@ -662,9 +676,9 @@ int FindPattern::read()
 		cout<<"Unable to open file"<<file1<<endl; 
 	}
 
-#ifdef DEBUG
+//#ifdef DEBUG
 	cout<<"Final: "<<a<<endl;
-#endif
+//#endif
 }
 
 
@@ -687,11 +701,7 @@ int main(int argc, char **argv)
 	{
 		cout<<"Enter Pattern: ";
 		cin>>pattern;
-		int place = findPattern.find(pattern);
-		if(place != -1)
-			cout<<"Found at: "<<place<<endl;
-		else
-			cout<<"Not Found"<<endl;
+		findPattern.find(pattern);
 	}
 	
 
