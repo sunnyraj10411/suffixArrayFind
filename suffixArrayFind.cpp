@@ -151,7 +151,9 @@ int FindPattern::getCompLcp(int start,string pat,int idx)
 vector<int> FindPattern::findRecurse(int start, int end, int l, int r,int index, string pat)
 {
 
+#if DEBUG
 	cout<<"Start "<<start<<" end "<<end<<" l "<<l<<" r "<<r<<" index "<<index<<" pat "<<pat<<endl;
+#endif
 
 	if( l == pat.size() && r == pat.size())
 	{
@@ -188,17 +190,21 @@ vector<int> FindPattern::findRecurse(int start, int end, int l, int r,int index,
 	if( l == r)
 	{
 		int m = getCompLcp(SA[mid],pat,l);
-
+#if DEBUG
 		cout<<start<<" sa[mid] "<<mid<<" "<<end<<" l "<<l<<" m "<<m<<" vs "<<pat[l+m] <<" vs "<<txt[SA[mid] + l] <<endl;
+#endif
 
 		if( l+m == pat.size() )
 		{
+#if DEBUG
 			cout<<"Doing both "<<start<<" "<<mid<<" "<<end<<endl;
+#endif
 			//do both size
 			vector<int> res1 = findRecurse(start,mid,l,l+m,2*index+1,pat);
 			vector<int> res2 = findRecurse(mid,end,l+m,r,2*index+2, pat);
-
+#if DEBUG
 			cout<<" Res: "<<res1[0]<<" "<<res1[1]<<" "<<res2[0]<<" "<<res2[1]<<endl;
+#endif
 
 			vector<int> result;
 			result.push_back(res1[0]);	
@@ -231,16 +237,21 @@ vector<int> FindPattern::findRecurse(int start, int end, int l, int r,int index,
 		{
 			//equal we have to do a lexicographic comparison
 			int m = getCompLcp(SA[mid],pat,l);
+#if DEBUG
 			cout<<"Doing  "<<start<<" "<<mid<<" "<<end<<" "<<l+m<<" "<<pat.size()<<endl;
+#endif
 	
 			if( l+m == pat.size() )
 			{
+#if DEBUG
 				cout<<"Doing both "<<start<<" "<<mid<<" "<<end<<endl;
+#endif
 				//do both size
 				vector<int> res1 = findRecurse(start,mid,l,l+m,2*index+1,pat);
 				vector<int> res2 = findRecurse(mid,end,l+m,r,2*index+2, pat);
-			
+#if DEBUG			
 				cout<<" Res: "<<res1[0]<<" "<<res1[1]<<" "<<res2[0]<<" "<<res2[1]<<endl;
+#endif
 
 				vector<int> result;
 				result.push_back(res1[0]);	
@@ -261,7 +272,9 @@ vector<int> FindPattern::findRecurse(int start, int end, int l, int r,int index,
 	}
 	else if( l < r)
 	{
+#if DEBUG
 		cout<<" l < r "<<lcpBinaryTree[2*index+2].lcp<<endl;
+#endif
 		if( r < lcpBinaryTree[2*index+2].lcp)
 		{
 			//we will go to the left side
@@ -276,16 +289,22 @@ vector<int> FindPattern::findRecurse(int start, int end, int l, int r,int index,
 		{
 			//equal we have to do a lexicographic comparison
 			int m = getCompLcp(SA[mid],pat,r);
+
+#if DEBUG
 			cout<<"Doing  "<<start<<" "<<mid<<" "<<end<<" "<<r+m<<" "<<pat.size()<<" b"<<endl;
+#endif
 
 			if( r+m == pat.size() )
 			{
+#if DEBUG
 				cout<<"Doing both "<<start<<" "<<mid<<" "<<end<<endl;
+#endif
 				//do both size
 				vector<int> res1 = findRecurse(start,mid,l,r+m,2*index+1,pat);
 				vector<int> res2 = findRecurse(mid,end,r+m,r,2*index+2, pat);
-				
+#if DEBUG				
 				cout<<" Res: "<<res1[0]<<" "<<res1[1]<<" "<<res2[0]<<" "<<res2[1]<<endl;
+#endif
 
 				vector<int> result;
 				result.push_back(res1[0]);	
@@ -295,8 +314,9 @@ vector<int> FindPattern::findRecurse(int start, int end, int l, int r,int index,
 			}
 
 
-
+#if DEBUG
 			cout<<" m "<<m<<endl;
+#endif
 			if( pat[r+m] > txt[SA[mid]+r+m])
 			{
 				return findRecurse(mid,end,r+m,r,2*index+2, pat);
@@ -323,22 +343,29 @@ int FindPattern::find(string pat)
 
 	//calculate lcp for pat and start 
 	//calculate lcp for pat and end
-	
+
 	int l = getCompLcp(SA[start],pat,0);
-        int r = getCompLcp(SA[end],pat,0);
+	int r = getCompLcp(SA[end],pat,0);
 
 	//cout<<"R "<<r<<" l "<<l<<endl;
-        
+
 	vector<int> result = findRecurse(start, end, l, r, 0, pat);	
 
 	cout<<" result "<<result[0]<<" to "<<result[1]<<endl;
 
-	cout<<"Pattern found at the following places: "<<endl;
-	for(int i = result[0] ; i <= result[1] ; i++)
+	if(result[0] == -1)
 	{
-		cout<<SA[i]<<endl;
+		cout<<"Pattern not found anywhere"<<endl;
 	}
-	
+	else
+	{
+		cout<<"Pattern found at the following places: "<<endl;
+		for(int i = result[0] ; i <= result[1] ; i++)
+		{
+			cout<<SA[i]<<endl;
+		}
+	}
+
 }
 
 int FindPattern::compare(int firstString,int secondString,int h)
