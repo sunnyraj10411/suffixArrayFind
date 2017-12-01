@@ -8,6 +8,7 @@ Suffix array is a sorted arrays of all the suffixes of a string. It was proposed
 4. Exact pattern matching using suffix arrays.
 
 ## Suffix Array construction
+We use the algorithm proposed by Manber and Myers for suffix array construction. This method takes more time to construct suffix array when compared to suffix array construction from suffix tree but it is more space efficient. Since space efficiency is the main reason for choosing suffix trees over suffix array we are using the more space efficient algorithm. This algorithm requires buckets for storing the start and end position of buckets, we define a data structure `Bucket` to store these values. The class `Buckets` is defined as follows: 
 
 
 
