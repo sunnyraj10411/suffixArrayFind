@@ -1,2 +1,4 @@
-# suffixArrayMUMmer
-Code for project
+# Suffix Array Construction and Exact Pattern Matching
+
+
+
